@@ -1,0 +1,24 @@
+import { Quadruple } from "ts-viewers-core";
+import { CryptInfo } from "../encryption/interfaces";
+import { ObjectType } from "../spec-constants";
+import { DataParser, ParserBounds } from "./data-parser";
+
+/**information used for parsing PDF object */
+export interface ParserInfo {
+  /** parser instance used to parse the object */
+  parser: DataParser;
+  /** object indices in the parser data array */
+  bounds: ParserBounds;
+  /** encryption info (only for encrypted PDF files) */
+  cryptInfo?: CryptInfo;
+  /** parent object stream id */
+  streamId?: number;
+  /** PDF object type */
+  type?: ObjectType;
+  /** parsed value (only for primitive objects which are parsed in place) */
+  value?: any;
+  /** max object rendering bounds */
+  rect?: Quadruple;
+  /** a function used to get ParseInfo for indirect objects */
+  parseInfoGetterAsync?: (id: number) => Promise<ParserInfo>;
+}

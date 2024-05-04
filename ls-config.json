@@ -1,0 +1,12 @@
+{
+  "host": "localhost",
+  "port": 17000,
+  "files": [
+    "./demo/**/*.{html,css,js,json,pdf}"
+  ],
+  "server": { 
+    "baseDir": "./demo",
+    "index": "./index.html"
+  },
+  "open": false
+}
