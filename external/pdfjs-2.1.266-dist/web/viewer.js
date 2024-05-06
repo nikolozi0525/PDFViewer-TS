@@ -6423,7 +6423,7 @@
           kind: OptionKind.VIEWER,
         },
         defaultUrl: {
-          value: "1.pdf",
+          value: "2.pdf",
           kind: OptionKind.VIEWER,
         },
         defaultZoomValue: {
@@ -8889,6 +8889,12 @@
             {
               key: "_updatePage",
               value: function _updatePage(index) {
+                console.log(
+                  "++++++",
+                  index,
+                  this._scrollMatches,
+                  this._selected.pageIdx
+                );
                 if (this._scrollMatches && this._selected.pageIdx === index) {
                   this._linkService.page = index + 1;
                 }
@@ -8902,6 +8908,7 @@
             {
               key: "_updateAllPages",
               value: function _updateAllPages() {
+                console.log("++++4444");
                 this._eventBus.dispatch("updatetextlayermatches", {
                   source: this,
                   pageIndex: -1,
@@ -8911,6 +8918,7 @@
             {
               key: "_nextMatch",
               value: function _nextMatch() {
+                console.log("++++55555");
                 var _this3 = this;
 
                 var previous = this._state.findPrevious;
@@ -9085,6 +9093,7 @@
             {
               key: "_onFindBarClose",
               value: function _onFindBarClose(evt) {
+                console.log("444444");
                 var _this4 = this;
 
                 var pdfDocument = this._pdfDocument;
@@ -15673,6 +15682,8 @@
                   return [];
                 }
 
+                console.log("_________", matches, matchesLength);
+
                 var findController = this.findController,
                   textContentItemsStr = this.textContentItemsStr;
                 var i = 0,
@@ -15729,7 +15740,8 @@
             },
             {
               key: "_renderMatches",
-              value: function _renderMatches(matches) {
+              value: function _renderMatches(matches, isCustom = false) {
+                console.log("$$$$", matches);
                 if (matches.length === 0) {
                   return;
                 }
@@ -15749,6 +15761,7 @@
                 };
 
                 function beginText(begin, className) {
+                  console.log("%%% begin Text %%%", begin, className);
                   var divIdx = begin.divIdx;
                   textDivs[divIdx].textContent = "";
                   appendTextToDiv(divIdx, 0, begin.offset, className);
@@ -15760,12 +15773,22 @@
                   toOffset,
                   className
                 ) {
+                  console.log(
+                    "%%% append Text %%%",
+                    divIdx,
+                    fromOffset,
+                    toOffset,
+                    className
+                  );
+
                   var div = textDivs[divIdx];
                   var content = textContentItemsStr[divIdx].substring(
                     fromOffset,
                     toOffset
                   );
                   var node = document.createTextNode(content);
+
+                  console.log("*&&&&&", node);
 
                   if (className) {
                     var span = document.createElement("span");
@@ -15793,7 +15816,11 @@
                   var begin = match.begin;
                   var end = match.end;
                   var isSelected = isSelectedPage && i === selectedMatchIdx;
-                  var highlightSuffix = isSelected ? " selected" : "";
+                  var highlightSuffix = isSelected
+                    ? isCustom
+                      ? " custom-highlight"
+                      : " selected"
+                    : "";
 
                   if (isSelected) {
                     findController.scrollMatchIntoView({
@@ -15899,6 +15926,8 @@
                   pageMatchesLength
                 );
 
+                console.log(")))))))))", this.matches);
+
                 this._renderMatches(this.matches);
               },
             },
@@ -15955,8 +15984,12 @@
                 var div = this.textLayerDiv;
                 var expandDivsTimer = null;
 
+                document.addEventListener("wheel", function (ev) {
+                  document.querySelector(".context-menu") &&
+                    document.querySelector(".context-menu").remove();
+                });
+
                 document.addEventListener("mousedown", function (ev) {
-                  console.log("@@@@@@ -----> mousedown");
                   document.querySelector(".context-menu") &&
                     document.querySelector(".context-menu").remove();
                 });
@@ -16002,8 +16035,6 @@
                 });
 
                 function showContextMenu(x, y, selectedText) {
-                  console.log("232332 show menu 34343");
-
                   const contextMenu = document.createElement("div");
                   contextMenu.classList.add("context-menu");
                   contextMenu.style.left = `${x}px`;
@@ -16030,8 +16061,19 @@
                   document.body.appendChild(contextMenu);
                 }
 
+                function highlightSelectedText(selectedText) {
+                  const selectedElements = window
+                    .getSelection()
+                    .getRangeAt(0)
+                    .cloneContents()
+                    .querySelectorAll("*");
+                  selectedElements.forEach((element) => {
+                    // Apply highlighting styles to the selected text elements
+                    element.classList.add("highlighted");
+                  });
+                }
+
                 function createMenuItem(label, callback) {
-                  console.log("232332 create menu 34343");
                   const menuItem = document.createElement("div");
                   menuItem.classList.add("context-menu-item");
                   menuItem.textContent = label;
